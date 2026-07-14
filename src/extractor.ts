@@ -42,6 +42,7 @@ export interface ExtractorResult {
   featuresLeft: number[];
   featuresRight: number[];
   blinkDetected: boolean;
+  ear: number;
   advancedFeatures?: AdvancedFrameFeatures;
 }
 
@@ -107,7 +108,7 @@ const MIN_HISTORY = 15;
 
 export function extractEyeFeatures(landmarks: Point3D[], faceMatrix?: Float32Array): ExtractorResult {
   if (landmarks.length < 478) {
-    return { featuresLeft: [], featuresRight: [], blinkDetected: false };
+    return { featuresLeft: [], featuresRight: [], blinkDetected: false, ear: 0 };
   }
 
   // 1. Head Pose Normalization (EyeTrax Logic)
@@ -264,5 +265,5 @@ export function extractEyeFeatures(landmarks: Point3D[], faceMatrix?: Float32Arr
     quality
   };
 
-  return { featuresLeft, featuresRight, blinkDetected, advancedFeatures };
+  return { featuresLeft, featuresRight, blinkDetected, ear, advancedFeatures };
 }

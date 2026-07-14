@@ -769,6 +769,58 @@ export function updateLightingWarning(isDark: boolean): void {
   if (el) el.style.display = isDark ? 'block' : 'none';
 }
 
+// ── Controles do filtro OneEuro expostos no painel (Sprint 2) ─────────────────
+export function addFilterControls(
+  defaultMincutoff: number,
+  defaultBeta: number,
+  onChange: (mincutoff: number, beta: number) => void
+): void {
+  const panel = document.getElementById('calibration-control-panel');
+  if (!panel || document.getElementById('filter-controls-section')) return;
+
+  const section = document.createElement('div');
+  section.id = 'filter-controls-section';
+  section.className = 'filter-controls-section';
+  section.innerHTML = `
+    <div class="panel-header" style="margin-top:6px">Filtro (1€)</div>
+    <div class="filter-row">
+      <span class="filter-label">Suavidade</span>
+      <input type="range" id="filter-mincutoff"
+        min="0.1" max="3.0" step="0.1" value="${defaultMincutoff}">
+      <span id="filter-mc-val" class="filter-val">${defaultMincutoff.toFixed(1)}</span>
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">Velocidade</span>
+      <input type="range" id="filter-beta"
+        min="0" max="0.05" step="0.001" value="${defaultBeta}">
+      <span id="filter-b-val" class="filter-val">${defaultBeta.toFixed(3)}</span>
+    </div>
+  `;
+
+  const privacyNote = panel.querySelector('.privacy-note');
+  if (privacyNote) {
+    panel.insertBefore(section, privacyNote);
+  } else {
+    panel.appendChild(section);
+  }
+
+  const mcInput = document.getElementById('filter-mincutoff') as HTMLInputElement;
+  const bInput  = document.getElementById('filter-beta')      as HTMLInputElement;
+  const mcVal   = document.getElementById('filter-mc-val');
+  const bVal    = document.getElementById('filter-b-val');
+
+  function update(): void {
+    const mc = parseFloat(mcInput.value);
+    const b  = parseFloat(bInput.value);
+    if (mcVal) mcVal.textContent = mc.toFixed(1);
+    if (bVal)  bVal.textContent  = b.toFixed(3);
+    onChange(mc, b);
+  }
+
+  mcInput.addEventListener('input', update);
+  bInput.addEventListener('input', update);
+}
+
 export function updateStatusUI(accuracyResult?: {
   meanError: number;
   maxError: number;

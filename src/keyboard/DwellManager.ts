@@ -7,7 +7,8 @@ export class DwellManager {
   private readonly DWELL_TIME = 500; // ms exigido no requisito
   
   // Como o app usa requestAnimationFrame, essa função será chamada continuamente
-  public update(cursorX: number, cursorY: number) {
+  // immediateSelect=true (piscada intencional) dispara o alvo atual sem esperar dwell
+  public update(cursorX: number, cursorY: number, immediateSelect = false) {
     // Oculta o cursor temporariamente para o elementFromPoint não pegar o próprio laser
     const laser = document.getElementById('laser');
     let displayOrigin = '';
@@ -40,15 +41,18 @@ export class DwellManager {
         // Inicia animação visual
         this.currentTarget.classList.add('dwelling');
       } else {
-        // Continua no mesmo alvo, checa o tempo
+        // Piscada intencional: dispara imediatamente sem esperar dwell
+        if (immediateSelect) {
+          this.triggerClick(this.currentTarget);
+          this.clearTarget();
+          return;
+        }
+        // Dwell normal: aguarda tempo configurado
         const elapsed = performance.now() - this.dwellStartTime;
         const requiredDwellTime = this.currentTarget.dataset.key === 'power' ? 2000 : this.DWELL_TIME;
         if (elapsed >= requiredDwellTime) {
-          // Dispara o clique
           this.triggerClick(this.currentTarget);
           this.clearTarget();
-          // Previne múltiplos cliques imediatos exigindo sair e entrar de novo
-          // Ao limpar o alvo, o próximo frame o detectará como novo alvo
         }
       }
     } else {
